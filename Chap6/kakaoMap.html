@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Kakao 지도 시작하기</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map" style="width:100%; height:100%;position: absolute;"></div>
+    <canvas id="cw"
+        style="position: absolute; z-index: 1; opacity: 0.4; pointer-events: none;"></canvas>
+        <button style = "position:fixed; z-index: 2;" onclick = "anim()">wind</button>
+        <button style = "position:fixed; z-index: 2; margin-left:50px;" onclick = "stopAnim()">wind x</button>
+        <div id = "windSpeed" style = "position: fixed; z-index: 2;  margin-left:130px;"></div>
+
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=020d0fbd973e383fdea8d9a865f0f211&libraries=services"></script>
+    <script src="windfromCoordinate.js"></script>
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=020d0fbd973e383fdea8d9a865f0f211"></script>
+    <script>
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+
+</head>
+
+<body>
+  <canvas id="cw" width="1000" height="1000" style="border: 1px solid black; padding: 50px"></canvas>
+</body>
+<script>
+  var A = [
+    { 'x': 0, 'y': 0, 'vector_x': 7, 'vector_y': -3 },
+    { 'x': 1000, 'y': 0, 'vector_x': 6, 'vector_y': 2 },
+    { 'x': 0, 'y': 1000, 'vector_x': -8, 'vector_y': -1 },
+    { 'x': 1000, 'y': 1000, 'vector_x': -5, 'vector_y': 2 }
+  ]
+
+  var cn;
+  //= document.getElementById('cw');
+  var c;
+  var u = 10;
+  const m = {
+    x: innerWidth / 2,
+    y: innerHeight / 2
+  };
+  var a = [];
+  window.onload = function myfunction() {
+    build();
+    anim()
+  }
+  window.onresize = function () {
+    build();
+  }
+  function build() {
+    cn = document.getElementById('cw');
+    c = cn.getContext('2d');
+    c.lineWidth = "2";
+    for (i = 0; i < 1000; i++) {
+      buildobj(i)
+    }
+  }
+  function buildobj(i) {
+    x = getRandomArbitrary(0, 1000)
+    y = getRandomArbitrary(0, 1000)
+    a[i] = new ob(x, y)
+
+  }
+  function ob(x, y) {
+    this.x = x;
+    this.y = y;
+
+    this.dr = function () {
+      const ls = {
+        x: this.x,
+        y: this.y
+      };
+      nextVec = getVector(ls.x, ls.y)
+      this.x = ls.x + nextVec.vector_x
+      this.y = ls.y + nextVec.vector_y
+      c.beginPath();
+      c.lineWidth = 1;
+      c.strokeStyle = "red";
+      c.moveTo(ls.x, ls.y);
+      c.lineTo(this.x, this.y);
+      c.stroke();
+      c.closePath();
+
+    }
+  }
+
+  var ss = 0
+  function anim() {
+    requestAnimationFrame(anim);
+
+    c.fillStyle = "rgba(255,255,255,0.3)";
+    c.fillRect(0, 0, 1000, 1000);
+    a.forEach(function (e, i) {
+      e.dr();
+    });
+  }
+
+  function getVector(vec_x, vec_y) {
+    var x = vec_x
+    var y = vec_y
+
+    d1 = x - A[0]['x']
+    d2 = A[1]['x'] - x
+
+    let x1_vector_x = (d1 / (d1 + d2)) * A[1].vector_x + (d2 / (d1 + d2)) * A[0].vector_x
+    let x1_vector_y = (d1 / (d1 + d2)) * A[1].vector_y + (d2 / (d1 + d2)) * A[0].vector_y
+    // console.log('x1x = ', x1_vector_x)
+    // console.log('x1y = ', x1_vector_y)
+
+    let x1 = { 'x': x, 'y': A[0].y, 'vector_x': x1_vector_x, 'vector_y': x1_vector_y }
+    // console.log('x1 = ', x1)
+    let x2_vector_x = (d1 / (d1 + d2)) * A[3].vector_x + (d2 / (d1 + d2)) * A[2].vector_x
+    let x2_vector_y = (d1 / (d1 + d2)) * A[3].vector_y + (d2 / (d1 + d2)) * A[2].vector_y
+    // console.log('x2x = ', x2_vector_x)
+    // console.log('x2y = ', x2_vector_y)
+
+    let x2 = { 'x': x, 'y': A[3].y, 'vector_x': x2_vector_x, 'vector_y': x2_vector_y }
+    // console.log('x2 = ' ,x2)
+    d3 = y - x1.y
+    d4 = x2.y - y
+
+    result_vector_x = (d3 / (d3 + d4)) * x2.vector_x + (d4 / (d3 + d4)) * x1_vector_x
+    // console.log('resx = ', result_vector_x)
+    result_vector_y = (d3 / (d3 + d4)) * x2.vector_y + (d4 / (d3 + d4)) * x1_vector_y
+    // console.log('resy = ' , result_vector_y)
+
+    result = { 'x': x, 'y': y, 'vector_x': result_vector_x, 'vector_y': result_vector_y }
+
+    return result
+  }
+  function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+</script>
+
+
+</html>
