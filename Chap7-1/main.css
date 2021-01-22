@@ -25,11 +25,6 @@ body,
         #playWind {
             margin-left: 10px;
         }
-
-        #stopWind {
-            margin-left: 70px;
-        }
-
         #windSpeed {
             margin-left: 130px;
         }
@@ -50,27 +45,27 @@ body,
         }
 
         #speed7 {
-            background: rgb(255, 0, 0);
+            
             color: white;
         }
 
         #speed5 {
-            background: rgb(255, 70, 0);
+            
             color: white;
         }
 
         #speed3 {
-            background: rgb(255, 100, 0);
+            
             color: white;
         }
 
         #speed1 {
-            background: rgb(255, 140, 0);
+            
             color: white;
         }
 
         #speed0 {
-            background: gray;
+            
             color: white;
         }
 
