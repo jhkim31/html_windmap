@@ -3,6 +3,7 @@ var minlat = 31
 var maxlat = 44
 var minlng = 115
 var maxlng = 138
+var gap = 0.5
 풍향데이터
 
 

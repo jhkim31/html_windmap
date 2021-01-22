@@ -15,9 +15,10 @@ var maxlat = 44
 var minlng = 115
 var maxlng = 138
 var gap = 0.5
-var latgap = maxlat - minlat
-var lnggap = maxlng - minlng
+var latgap = ((maxlat * 10) - (minlat * 10)) / 10
+var lnggap = ((maxlng * 10) - (minlng * 10)) / 10
 var windCount = 500;
+var showSpeed = 1
 
 //페이지 로드시 실행
 window.onload = function myfunction() {
@@ -83,8 +84,8 @@ function ob(x, y, latitude, longitude, index, frame) {
             };
 
             nextVec = getVector(this.latitude, this.longitude)                          // 현재 좌표에서 벡터 계산
-            this.x = ls.x + nextVec[0]                                                  // 현재 좌표에서 벡터만큼 이동                                                                                                      
-            this.y = ls.y + nextVec[1]                                                  // 현재 좌표에서 벡터만큼 이동                                                                                                      
+            this.x = ls.x + nextVec[0] * showSpeed                                           // 현재 좌표에서 벡터만큼 이동                                                                                                      
+            this.y = ls.y + nextVec[1] * showSpeed                                                  // 현재 좌표에서 벡터만큼 이동                                                                                                      
 
             point = new kakao.maps.Point(this.x, this.y)
             this.latitude = coordinate.coordsFromContainerPoint(point).Ma               // 이동한 만큼 다시 현재 위치 계산
@@ -135,8 +136,8 @@ function getVector(latitude, longitude) {
 
 //위도와 경도를 가지고 적절한 그리드 리턴 (경도 0.25 단위 , 위도 0.25 단위로 쪼개어져 있음.)
 function selectGrid(latitude, longitude) {
-    gridlng = parseInt((longitude - minlng) / gap)         //ex) 
-    gridlat = parseInt((maxlat - latitude) / gap)           //ex) 
+    gridlng = Math.floor(((longitude * 10 - minlng * 10) / (gap * 10)))
+    gridlat = Math.floor(((maxlat * 10 - latitude * 10) / (gap * 10)))
 
     return [gridlat, gridlng]
 }
@@ -148,11 +149,13 @@ var interpolate = function (latitude, longitude, g00, g10, g01, g11, gridn) {
     d1 = x
     d2 = 1 - x
 
-    let x1_vector_x = d1 * g10[0] + d2 * g00[0]
-    let x1_vector_y = d1 * g10[1] + d2 * g00[1]
-    let x2_vector_x
-    let x2_vector_y
+    var x1_vector_x
+    var x1_vector_y
+    var x2_vector_x
+    var x2_vector_y
     try {
+        x1_vector_x = d1 * g10[0] + d2 * g00[0]
+        x1_vector_y = d1 * g10[1] + d2 * g00[1]
         x2_vector_x = d1 * g11[0] + d2 * g01[0]
         x2_vector_y = d1 * g11[1] + d2 * g01[1]
     } catch (error) {
@@ -184,18 +187,19 @@ function init() {
     cny = cn.height - 1
     c.linewidth = "1";
     windCount = document.getElementById("range1").value
+    showSpeed = document.getElementById("range2").value
 }
 
 // 위.경도 그리드값 읽어오기
 function readGrid() {
     var ajaxs = []
     count = 0;
-    // for (j = maxlat; j >= minlat; j -= gap) {
-    //     for (i = minlng; i <= maxlng; i += gap) {
-    //         count++;
-    //         ajaxs.push(fetch('http://api.openweathermap.org/data/2.5/weather?lat=' + j + '&lon=' + i + '&appid=bae6700b1efedde528414da0f209d309'))
-    //     }
-    // }
+    for (j = maxlat * 10; j >= minlat * 10; j -= gap * 10) {
+        for (i = minlng * 10; i <= maxlng * 10; i += gap * 10) {
+            count++;
+            ajaxs.push(fetch('http://api.openweathermap.org/data/2.5/weather?lat=' + j / 10 + '&lon=' + i / 10 + '&appid=bae6700b1efedde528414da0f209d309'))
+        }
+    }
     var vector = []
     Promise.all(ajaxs).then((values) => {
         debugger;
@@ -228,12 +232,12 @@ function readGrid() {
             }
         })
         var line = 0;
+        debugger;
         gridData = vector
-        count = 0;
-
-        for (i = 0; i < ((latgap / gap) + 1); i++) {
+        var count = 0;
+        for (i = 0; i < ((latgap * 10) / (gap * 10)) + 1; i++) {
             grid[i] = []
-            for (j = 0; j < ((lnggap / gap) + 1); j++) {
+            for (j = 0; j < ((lnggap * 10) / (gap * 10)) + 1; j++) {
                 grid[i][j] = []
                 grid[i][j][0] = gridData[count++]
                 grid[i][j][1] = gridData[count++]
@@ -270,9 +274,20 @@ var windCountDiv = document.getElementById('windCount');
 var gauge = document.getElementById('range1')
 windCountDiv.innerHTML = gauge.value
 
+var showSpeedDiv = document.getElementById("showSpeed");
+var gauge2 = document.getElementById("range2");
+showSpeedDiv.innerHTML = gauge2.value
+
+
 gauge.oninput = function () {
     windCountDiv.innerHTML = this.value
     windCount = this.value
+    build()
+}
+
+gauge2.oninput = function () {
+    showSpeedDiv.innerHTML = this.value
+    showSpeed = this.value
     build()
 }
 
