@@ -1,0 +1,138 @@
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+  <title>Getting Properties With Event Handlers</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCuOHuyvYwuXvtc6-jMFEOb8iHHwyF4y0Y&callback=initMap&libraries=&v=weekly"
+    defer></script>
+  <style type="text/css">
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+    #map {
+      width: 800px;
+      height: 800px;
+      position: absolute;
+      z-index: 0;
+    }
+
+    #canvas {
+      position: absolute;
+      z-index: 1;
+      border: 1px solid red;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <script>
+
+    function initMap() {
+      var seoul = { lat: 37.4142135, lng: 127.2706985 };
+
+      const map = new google.maps.Map(
+        document.getElementById("map"), {
+        zoom: 15,
+        center: seoul,
+      });
+      var myLatlng = { latitude: 37.4142135, longitude: 127.2706985 }
+      new google.maps.Marker({
+        position: seoul,
+        map,
+        title: "Hello World!",
+      });
+      let infoWindow = new google.maps.InfoWindow({
+        content: "Click the map to get Lat/Lng!",
+        position: myLatlng,
+      });
+      infoWindow.open(map);
+      // Configure the click listener.
+      map.addListener("click", (mapsMouseEvent) => {
+        
+        // Close the current InfoWindow.
+        infoWindow.close();
+        // Create a new InfoWindow.
+        infoWindow = new google.maps.InfoWindow({
+          position: mapsMouseEvent.latLng,
+        });
+        console.log(mapsMouseEvent.latLng.toJSON())
+        infoWindow.setContent(
+          JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2)
+        );
+        infoWindow.open(map);
+      });
+    }
+    window.onload = function myfunction() {
+      draw()
+    }
+    function draw() {
+      var c = document.getElementById('canvas');
+
+      if (c.getContext) {
+        var ctx = c.getContext('2d')
+
+        for (i = 0; i < 20; i++) {
+          ctx.moveTo((800 / 20) * i, 0);
+          ctx.lineTo((800 / 20) * i, 800);
+          ctx.lineWidth = 1
+          ctx.stroke();
+        }
+        for (i = 0; i < 20; i++) {
+          ctx.moveTo(0, (800 / 20) * i);
+          ctx.lineTo(800, (800 / 20) * i);
+          ctx.lineWidth = 1
+          ctx.stroke();
+        }
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div id="overlay">
+    <div id="map"></div>
+    <canvas id="canvas" width="800px" height="800px"></canvas>
+  </div>
+
+</body>
+
+</html>
+ -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Getting Properties With Event Handlers</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCuOHuyvYwuXvtc6-jMFEOb8iHHwyF4y0Y&callback=initMap&libraries=&v=weekly"
+    defer></script>
+  <script>
+    function initMap() {
+      var seoul = { lat: 37.56532723199129, lng: 126.98799094110187 };
+      const map = new google.maps.Map(
+        document.getElementById("map"), {
+        zoom: 15,
+        center: seoul,
+      });
+
+      map.addListener("click", (mapsMouseEvent) => {
+        console.log(mapsMouseEvent.pixel)
+        console.log(mapsMouseEvent.latLng.toJSON())
+      });
+    }
+  </script>
+</head>
+<body>  
+    <div id="map" style = "width:500px; height:500px;"></div>
+</body>
+</html>

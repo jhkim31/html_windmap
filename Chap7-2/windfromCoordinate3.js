@@ -1,7 +1,20 @@
 var gridData = []
 
 //canvas ==================================================================================== START
+//canvas ==================================================================================== START
+//canvas ==================================================================================== START
+//canvas ==================================================================================== START
+//canvas ==================================================================================== START
+//canvas ==================================================================================== START
+
 //canvas 변수 선언 ---------------------------------------------------------------------------- START
+//canvas 변수 선언 ---------------------------------------------------------------------------- START
+//canvas 변수 선언 ---------------------------------------------------------------------------- START
+//canvas 변수 선언 ---------------------------------------------------------------------------- START
+//canvas 변수 선언 ---------------------------------------------------------------------------- START
+//canvas 변수 선언 ---------------------------------------------------------------------------- START
+//canvas 변수 선언 ---------------------------------------------------------------------------- START
+
 var cn = document.getElementById('cw')              // 캔버스 객체
 var c = cn.getContext('2d');                        // 캔버스
 var a = []                                          // 바람 하나하나 객체의 배열
@@ -10,13 +23,43 @@ var cny;                                            // 캔버스 height
 var grid = []                                       // 위도 경도에 따른 그리드 배열
 var currentFrame = 0                                // 애니메이션의 현재 프레임
 var animationId                                     // 애니메이션 아이디 (정지시 필요)
-var minlat = 31
-var maxlat = 44
-var minlng = 115
-var maxlng = 138
-var gap = 0.5
-var latgap = ((maxlat * 10) - (minlat * 10)) / 10
-var lnggap = ((maxlng * 10) - (minlng * 10)) / 10
+var minlat = 33
+var maxlat = 34
+var minlng = 126
+var maxlng = 127
+var gap = 1.0
+var showWind = false
+
+var speed7 = {
+    "dom": document.getElementById('speed7'),
+    "color": "",
+    "picker": document.getElementById('picker7')
+}
+var speed5 = {
+    "dom": document.getElementById('speed5'),
+    "color": "",
+    "picker": document.getElementById('picker5')
+}
+var speed3 = {
+    "dom": document.getElementById('speed3'),
+    "color": "",
+    "picker": document.getElementById('picker3')
+}
+var speed1 = {
+    "dom": document.getElementById('speed1'),
+    "color": "",
+    "picker": document.getElementById('picker1')
+}
+var speed0 = {
+    "dom": document.getElementById('speed0'),
+    "color": "",
+    "picker": document.getElementById('picker0')
+}
+
+
+
+var latgap = (maxlat * 10 - minlat * 10) / 10
+var lnggap = (maxlng * 10 - minlng * 10) / 10
 var windCount = 500;
 var showSpeed = 1
 
@@ -24,18 +67,29 @@ var showSpeed = 1
 window.onload = function myfunction() {
     init()
     readGrid()
-    build();
 }
 
 //페이지 resize시 실행
 window.onresize = () => {
     init();
-    build();
 }
 
 
 //canvas 변수 선언 --------------------------------------------------------------------------- END
+//canvas 변수 선언 --------------------------------------------------------------------------- END
+//canvas 변수 선언 --------------------------------------------------------------------------- END
+//canvas 변수 선언 --------------------------------------------------------------------------- END
+//canvas 변수 선언 --------------------------------------------------------------------------- END
+//canvas 변수 선언 --------------------------------------------------------------------------- END
+//canvas 변수 선언 --------------------------------------------------------------------------- END
 
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
+// 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
 // 바람 객체 빌드 관련 -------------------------------------------------------------------------- START
 
 //바람 객체 생성 
@@ -45,6 +99,7 @@ function build() {
         buildobj(i)
     }
 }
+
 
 //바람 객체 생성 (실제 인스턴스 생성)
 function buildobj(i) {
@@ -84,8 +139,8 @@ function ob(x, y, latitude, longitude, index, frame) {
             };
 
             nextVec = getVector(this.latitude, this.longitude)                          // 현재 좌표에서 벡터 계산
-            this.x = ls.x + nextVec[0] * showSpeed                                           // 현재 좌표에서 벡터만큼 이동                                                                                                      
-            this.y = ls.y + nextVec[1] * showSpeed                                                  // 현재 좌표에서 벡터만큼 이동                                                                                                      
+            this.x = ls.x + nextVec[0] * showSpeed                                                  // 현재 좌표에서 벡터만큼 이동                                                                                                      
+            this.y = ls.y + nextVec[1] * showSpeed                                            // 현재 좌표에서 벡터만큼 이동                                                                                                      
 
             point = new kakao.maps.Point(this.x, this.y)
             this.latitude = coordinate.coordsFromContainerPoint(point).Ma               // 이동한 만큼 다시 현재 위치 계산
@@ -94,17 +149,16 @@ function ob(x, y, latitude, longitude, index, frame) {
             c.beginPath();
             c.lineWidth = 2;
             if (nextVec[2] > 7) {
-                c.strokeStyle = "rgb(255,0,0)";
+                c.strokeStyle = speed7.color;
             } else if (nextVec[2] > 5) {
-                c.strokeStyle = "rgb(255,70,0)";
+                c.strokeStyle = speed5.color;
             } else if (nextVec[2] > 3) {
-                c.strokeStyle = "rgb(255, 100, 0)";
+                c.strokeStyle = speed3.color;
             } else if (nextVec[2] > 1) {
-                c.strokeStyle = "rgb(255, 140, 0)";
+                c.strokeStyle = speed1.color;
             } else {
-                c.strokeStyle = "rgb(255,180,0)";
+                c.strokeStyle = speed0.color;
             }
-            // c.strokeStyle = "rgb(255,0,0)";
             c.moveTo(ls.x, ls.y);
             c.lineTo(this.x, this.y);
             c.stroke();
@@ -115,7 +169,20 @@ function ob(x, y, latitude, longitude, index, frame) {
     }
 }
 // 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
+// 바람 객체 빌드 관련 ----------------------------------------------------------------------------------- END
 
+//벡터 획득 알고리즘 (bilinear interpolation) ------------------------------------------------------------ START
+//벡터 획득 알고리즘 (bilinear interpolation) ------------------------------------------------------------ START
+//벡터 획득 알고리즘 (bilinear interpolation) ------------------------------------------------------------ START
+//벡터 획득 알고리즘 (bilinear interpolation) ------------------------------------------------------------ START
+//벡터 획득 알고리즘 (bilinear interpolation) ------------------------------------------------------------ START
 //벡터 획득 알고리즘 (bilinear interpolation) ------------------------------------------------------------ START
 
 //현재 위도와 경도의 벡터 리턴
@@ -136,6 +203,7 @@ function getVector(latitude, longitude) {
 
 //위도와 경도를 가지고 적절한 그리드 리턴 (경도 0.25 단위 , 위도 0.25 단위로 쪼개어져 있음.)
 function selectGrid(latitude, longitude) {
+
     gridlng = Math.floor(((longitude * 10 - minlng * 10) / (gap * 10)))
     gridlat = Math.floor(((maxlat * 10 - latitude * 10) / (gap * 10)))
 
@@ -176,7 +244,23 @@ var interpolate = function (latitude, longitude, g00, g10, g01, g11, gridn) {
 }
 
 //벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
+//벡터 획득 알고리즘 (bilinear interpolation) ----------------------------------------------------- END
 
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
+// 애니메이션, 기타 ------------------------------------------------------------------------------- START
 // 애니메이션, 기타 ------------------------------------------------------------------------------- START
 
 //캔버스 초기값 세팅
@@ -188,9 +272,30 @@ function init() {
     c.linewidth = "1";
     windCount = document.getElementById("range1").value
     showSpeed = document.getElementById("range2").value
+
+    speed7.color = speed7.picker.value
+    speed7.dom.style.backgroundColor = speed7.color
+
+    speed5.color = speed5.picker.value
+    speed5.dom.style.backgroundColor = speed5.color
+
+    speed3.color = speed3.picker.value
+    speed3.dom.style.backgroundColor = speed3.color
+
+    speed1.color = speed1.picker.value
+    speed1.dom.style.backgroundColor = speed1.color
+
+    speed0.color = speed0.picker.value
+    speed0.dom.style.backgroundColor = speed0.color
+
 }
 
 // 위.경도 그리드값 읽어오기
+//min, max 랜덤값 리턴
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
 function readGrid() {
     var ajaxs = []
     count = 0;
@@ -249,10 +354,20 @@ function readGrid() {
 
 }
 
-//min, max 랜덤값 리턴
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
+
+
+function writeGridData() {
+    i = 0;
+    gridData.forEach(data => {
+        document.write(data, ',');
+        i++;
+        if (i == 20) {
+            i = 0;
+            document.write("<br>")
+        }
+    })
 }
+
 
 // 애니메이션 생성
 function anim() {
@@ -278,12 +393,12 @@ var showSpeedDiv = document.getElementById("showSpeed");
 var gauge2 = document.getElementById("range2");
 showSpeedDiv.innerHTML = gauge2.value
 
-
 gauge.oninput = function () {
     windCountDiv.innerHTML = this.value
     windCount = this.value
     build()
 }
+
 
 gauge2.oninput = function () {
     showSpeedDiv.innerHTML = this.value
@@ -291,25 +406,48 @@ gauge2.oninput = function () {
     build()
 }
 
-document.getElementById('playWind').addEventListener('click', e => {
-    anim()
-})
+document.getElementById('playWind').addEventListener('click',toggleWindLayer)
 
-document.getElementById('stopWind').addEventListener('click', e => {
-    stopAnim()
-})
-
-function writeGridData() {
-    i = 0;
-    gridData.forEach(data => {
-        document.write(data, ',');
-        i++;
-        if ( i == 20){
-            i = 0;
-            document.write("<br>");
-        }
-    })
+function toggleWindLayer() {
+    if (showWind) {
+        a = []
+        stopAnim()
+        init()
+        showWind = !showWind
+    } else {
+        build()
+        anim()
+        showWind = !showWind
+    }
 }
+
+speed7.picker.addEventListener("input", e => {
+    speed7.color = e.target.value
+    speed7.dom.style.backgroundColor = speed7.color
+}, false)
+
+speed5.picker.addEventListener("input", e => {
+    speed5.color = e.target.value
+    speed5.dom.style.backgroundColor = speed5.color
+
+}, false)
+
+speed3.picker.addEventListener("input", e => {
+    speed3.color = e.target.value
+    speed3.dom.style.backgroundColor = speed3.color
+}, false)
+
+speed1.picker.addEventListener("input", e => {
+    speed1.color = e.target.value
+    speed1.dom.style.backgroundColor = speed1.color
+}, false)
+
+speed0.picker.addEventListener("input", e => {
+    speed0.color = e.target.value
+    speed0.dom.style.backgroundColor = speed0.color
+}, false)
+
+
 // 애니메이션, 기타 --------------------------------------------------------------------------- END
 
 //canvas ================================================================================== END
@@ -341,16 +479,16 @@ container.addEventListener('click', e => {
     vector = getVector(mapProjection.coordsFromContainerPoint(point).Ma, mapProjection.coordsFromContainerPoint(point).La)
     windSpeed.innerHTML =
         `${mapProjection.coordsFromContainerPoint(point).Ma.toFixed(3)}, ${mapProjection.coordsFromContainerPoint(point).La.toFixed(3)}, 
-    vector : ${vector[0].toFixed(3)}, ${vector[1].toFixed(3)} scale: ${vector[2].toFixed(3)}`
+    vector : ${vector[0].toFixed(3)}, ${vector[1].toFixed(3)} scale: ${vector[2].toFixed(3)}m/s zoomLevel: ${map.getLevel()}`
 
 })
-kakao.maps.event.addListener(map, 'dragend', () => {
-    build()
-})
+// kakao.maps.event.addListener(map, 'dragend', () => {
+//     build()
+// })
 
-kakao.maps.event.addListener(map, 'zoom_changed', () => {
-    build()
-})
+// kakao.maps.event.addListener(map, 'zoom_changed', () => {
+//     build()
+// })
 
 // 카카오맵 이벤트 등록 ----------------------------------------------------------------- END
 
