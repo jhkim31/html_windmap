@@ -139,12 +139,12 @@ simpleheat.prototype = {
 };
 
 
-import { data as stationData} from './data.js';
-var gap = 0.1
+import { data as stationData } from './data.js';
+var stationGap = 0.1
 var container = document.getElementById('map');                 //지도를 그릴 element
 var options = {
     center: new kakao.maps.LatLng(36.970, 127.589),
-    level: 10
+    level: 12
 };                                                              //지도의 설정 정보
 
 var map = new kakao.maps.Map(container, options);               // container element에 맵 객체 생성
@@ -176,10 +176,10 @@ for (var i = 0; i < stationData.length; i++) {
 }
 
 function noStationAround(latitude, longitude) {
-    var x0 = parseFloat(longitude) - gap;
-    var x1 = parseFloat(longitude) + gap;
-    var y0 = parseFloat(latitude) + gap;
-    var y1 = parseFloat(latitude) - gap;
+    var x0 = parseFloat(longitude) - stationGap;
+    var x1 = parseFloat(longitude) + stationGap;
+    var y0 = parseFloat(latitude) + stationGap;
+    var y1 = parseFloat(latitude) - stationGap;
 
 
     for (var i = 0; i < drawnStation.length; i++) {
@@ -211,6 +211,164 @@ function countAppearStation() {
     return appearStation
 }
 
+function countAppearStation2() {
+    var appearStation = []
+    var count = 0;
+    for (var i = 0; i < grid.length; i++) {
+        if (appearOnScreen(grid[i][0], grid[i][1])) {
+            appearStation.push(grid[i])
+            count++
+        }
+    }
+    console.log(count);
+    console.log(appearStation)
+    return appearStation
+}
+var minlat = 33
+var maxlat = 38.5
+var minlng = 126
+var maxlng = 129.5
+var gap = 0.2
+
+
+
+
+//위도와 경도를 가지고 적절한 그리드 리턴 (경도 0.25 단위 , 위도 0.25 단위로 쪼개어져 있음.)
+function selectGrid(latitude, longitude) {
+
+    gridlng = Math.floor(((longitude * 10 - minlng * 10) / (gap * 10)))
+    gridlat = Math.floor(((maxlat * 10 - latitude * 10) / (gap * 10)))
+
+    return [gridlat, gridlng]
+}
+
+//위도 경도. 그리드로 보간값 계산
+var interpolate = function (latitude, longitude, g00, g10, g01, g11, gridn) {
+    var x = (longitude % gap) * (1 / gap)
+
+    var d1 = x
+    var d2 = 1 - x
+
+    var x1_vector_x
+    var x2_vector_x
+    try {
+        x1_vector_x = d1 * g10[0] + d2 * g00[0]
+        x2_vector_x = d1 * g11[0] + d2 * g01[0]
+    } catch (error) {
+        debugger;
+    }
+
+
+    var y = (latitude % gap) * (1 / gap)
+    var d4 = y
+    var d3 = 1 - y
+
+    var result_vector_x = d3 * x2_vector_x + d4 * x1_vector_x
+
+
+
+
+    return result_vector_x                //보간값 리턴
+}
+var grid = [];
+function init() {
+    for (var j = maxlat; j >= minlat; j -= gap) {
+        for (var i = minlng; i <= maxlng; i += gap) {
+            var stationInGrid = selectStations(j,i);
+            var v = IDWInterpolation(j, i, stationInGrid);
+            if (isNaN(v)){
+                grid.push([j,i,grid[grid.length - 1][2]])
+            } else {
+                grid.push([j,i,v])
+            }
+            
+        }
+    }
+}
+var data;
+var heat;
+var frame;
+window.onload = function myfunction() {
+    init();
+    for (var i = 0; i < grid.length; i++) {
+        var content = `
+                    <div class ="label" style = "background: red;">                                                    
+                        ${grid[i][2].toFixed(3)}<br>                                            
+                    </div>
+                `;
+    
+        // 커스텀 오버레이가 표시될 위치입니다 
+        var position = new kakao.maps.LatLng(grid[i][0], grid[i][1]);
+    
+        // 커스텀 오버레이를 생성합니다
+        var customOverlay = new kakao.maps.CustomOverlay({
+            position: position,
+            content: content
+        });
+        customOverlay.setMap(map);
+    }
+    data = function () {
+        var returnData = []
+        var appearStation = countAppearStation2();
+        for (var i = 0; i < appearStation.length; i++) {
+            var point = new kakao.maps.LatLng(appearStation[i][0], appearStation[i][1]);
+            var xy = coordinate.containerPointFromCoords(point)
+            console.log(xy)
+            var tmp = []
+            tmp.push(xy.x, xy.y, appearStation[i][2] / 3)
+            returnData.push(tmp)
+        }
+        console.log(returnData)
+        return returnData;
+    }();
+    
+    heat = simpleheat('canvas').data(data).max(18);
+    draw();
+}
+
+
+
+    
+function IDWInterpolation(latitude, longitude, stations) {
+    var sum1 = 0;
+    var sum2 = 0;
+    for (var i = 0; i < stations.length; i ++){
+        var d = getDistanceFromLatLonInKm(parseFloat(stations[i].latitude), parseFloat(stations[i].longitude), latitude, longitude);
+        if (d == NaN){
+            debugger;
+            console.log(stations[i])
+        }
+        sum1 += (stations[i].pm10Value / (d * d));
+        sum2 += (1 / (d * d));
+    }
+    return sum1 / sum2;
+}
+function selectStations(latitude, longitude) {
+    var returnData = []
+    for (var i = 0; i < stationData.length; i++){
+        if (stationData[i].latitude < latitude && stationData[i].latitude >= latitude - 1){
+            if (stationData[i].longitude > longitude && stationData[i].longitude < longitude + 1 ){
+                returnData.push(stationData[i])
+            }
+        }
+    }
+    return returnData
+}
+
+
+function getDistanceFromLatLonInKm(lat1, lng1, lat2, lng2) {
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180)
+    }
+
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    var dLon = deg2rad(lng2 - lng1);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c; // Distance in km
+    return d;
+}
 
 function appearOnScreen(latitude, longitude) {
     var x0 = 0;
@@ -233,23 +391,21 @@ function appearOnScreen(latitude, longitude) {
     return false;
 }
 
-var data;
-data = function () {
-    var returnData = []
-    var appearStation = countAppearStation();
-    for(var i = 0; i < appearStation.length; i++){
-        var point = new kakao.maps.LatLng(appearStation[i].latitude, appearStation[i].longitude);
-        var xy = coordinate.containerPointFromCoords(point)
-        console.log(xy)
-        var tmp = []
-        tmp.push(xy.x, xy.y, appearStation[i].pm10Value)
-        returnData.push(tmp)
-    }
-    console.log(returnData)
-    return returnData;
-}();
-var heat = simpleheat('canvas').data(data).max(18);
-var frame;
+// var data;
+// data = function () {
+//     var returnData = []
+//     var appearStation = countAppearStation();
+//     for (var i = 0; i < appearStation.length; i++) {
+//         var point = new kakao.maps.LatLng(appearStation[i].latitude, appearStation[i].longitude);
+//         var xy = coordinate.containerPointFromCoords(point)
+//         console.log(xy)
+//         var tmp = []
+//         tmp.push(xy.x, xy.y, appearStation[i].pm10Value)
+//         returnData.push(tmp)
+//     }
+//     console.log(returnData)
+//     return returnData;
+// }();
 
 var canvas = document.getElementById('canvas')
 canvas.width = window.innerWidth
@@ -271,7 +427,7 @@ function draw() {
     frame = null;
 }
 
-draw();
+
 
 
 
@@ -289,40 +445,42 @@ radius[changeType] = blur[changeType] = function (e) {
     frame = frame || window.requestAnimationFrame(draw);
 };
 
-kakao.maps.event.addListener(map, 'dragend', () => {
-    data = function () {
-        var returnData = []
-        var appearStation = countAppearStation();
-        for(var i = 0; i < appearStation.length; i++){
-            var point = new kakao.maps.LatLng(appearStation[i].latitude, appearStation[i].longitude);
-            var xy = coordinate.containerPointFromCoords(point)
-            console.log(xy)
-            var tmp = []
-            tmp.push(xy.x, xy.y, appearStation[i].pm10Value)
-            returnData.push(tmp)
-        }
-        console.log(returnData)
-        return returnData;
-    }();
-    heat = simpleheat('canvas').data(data).max(18);
-    draw()    
-})
+// kakao.maps.event.addListener(map, 'dragend', () => {
+//     data = function () {
+//         var returnData = []
+//         var appearStation = countAppearStation2();
+//         for (var i = 0; i < appearStation.length; i++) {
+//             var point = new kakao.maps.LatLng(appearStation[i][0], appearStation[i][1]);
+//             var xy = coordinate.containerPointFromCoords(point)
+//             console.log(xy)
+//             var tmp = []
+//             tmp.push(xy.x, xy.y, appearStation[i][2] / 2)
+//             returnData.push(tmp)
+//         }
+//         console.log(returnData)
+//         return returnData;
+//     }();
+    
+//     heat = simpleheat('canvas').data(data).max(18);
+//     draw();
+// })
 
-kakao.maps.event.addListener(map, 'zoom_changed', () => {
-    data = function () {
-        var returnData = []
-        var appearStation = countAppearStation();
-        for(var i = 0; i < appearStation.length; i++){
-            var point = new kakao.maps.LatLng(appearStation[i].latitude, appearStation[i].longitude);
-            var xy = coordinate.containerPointFromCoords(point)
-            console.log(xy)
-            var tmp = []
-            tmp.push(xy.x, xy.y, appearStation[i].pm10Value)
-            returnData.push(tmp)
-        }
-        console.log(returnData)
-        return returnData;
-    }();
-    heat = simpleheat('canvas').data(data).max(18);
-    draw();
-})
+// kakao.maps.event.addListener(map, 'zoom_changed', () => {
+//     data = function () {
+//         var returnData = []
+//         var appearStation = countAppearStation2();
+//         for (var i = 0; i < appearStation.length; i++) {
+//             var point = new kakao.maps.LatLng(appearStation[i][0], appearStation[i][1]);
+//             var xy = coordinate.containerPointFromCoords(point)
+//             console.log(xy)
+//             var tmp = []
+//             tmp.push(xy.x, xy.y, appearStation[i][2] / 2)
+//             returnData.push(tmp)
+//         }
+//         console.log(returnData)
+//         return returnData;
+//     }();
+    
+//     heat = simpleheat('canvas').data(data).max(18);
+//     draw();
+// })
