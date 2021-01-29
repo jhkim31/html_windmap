@@ -23,11 +23,11 @@ var cny;                                            // 캔버스 height
 var grid = []                                       // 위도 경도에 따른 그리드 배열
 var currentFrame = 0                                // 애니메이션의 현재 프레임
 var animationId                                     // 애니메이션 아이디 (정지시 필요)
-var minlat = 33
-var maxlat = 34
-var minlng = 126
-var maxlng = 127
-var gap = 1.0
+var minlat = 31
+var maxlat = 44
+var minlng = 115
+var maxlng = 138
+var gap = 0.5
 var showWind = false
 
 var speed7 = {
@@ -302,7 +302,7 @@ function readGrid() {
     for (j = maxlat * 10; j >= minlat * 10; j -= gap * 10) {
         for (i = minlng * 10; i <= maxlng * 10; i += gap * 10) {
             count++;
-            ajaxs.push(fetch('http://api.openweathermap.org/data/2.5/weather?lat=' + j / 10 + '&lon=' + i / 10 + '&appid=bae6700b1efedde528414da0f209d309'))
+            ajaxs.push(fetch('//api.openweathermap.org/data/2.5/weather?lat=' + j / 10 + '&lon=' + i / 10 + '&appid=bae6700b1efedde528414da0f209d309'))
         }
     }
     var vector = []
