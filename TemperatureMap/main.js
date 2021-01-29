@@ -12,10 +12,10 @@ var coordinate = map.getProjection()
 var drawnStation = []
 
 var minlat = 33
-var maxlat = 38.6
+var maxlat = 38
 var latgap = ((maxlat * 10) - (minlat * 10)) / 10
 var minlng = 126
-var maxlng = 129.6
+var maxlng = 131
 var lnggap = ((maxlng * 10) - (minlng * 10)) / 10
 var gap = 0.2
 var grid = []
@@ -27,10 +27,10 @@ canvas.height = window.innerHeight
 
 
 window.onload = function () {
-    // showOverlay()
+    showOverlay()
     init();
     // showGrid();
-    
+
 }
 
 function showOverlay() {
@@ -152,7 +152,7 @@ function init() {
             var stationInGrid = selectStations(j, i);
             var v = IDWInterpolation(j, i, stationInGrid);
             if (isNaN(v)) {
-                grid[county][countx] = [j.toFixed(2), i.toFixed(2), 40]
+                grid[county][countx] = [j.toFixed(2), i.toFixed(2), 10]
             } else {
                 grid[county][countx] = [j.toFixed(2), i.toFixed(2), v]
             }
@@ -167,8 +167,8 @@ function drawCanvas() {
     var g = 0;
     var r = 0;
     var pixelGap = 10
-    var maxValue = 70;
-    var minValue = 30;
+    var maxValue = 50;
+    var minValue = 10;
     var centerValue = (maxValue + minValue) / 2;
     var value = 0;
     for (var i = 0; i < canvas.height / pixelGap; i++) {
@@ -183,15 +183,22 @@ function drawCanvas() {
                 g = 255;
                 r = 255 * ((value - minValue) / (centerValue - minValue))
             }
+            // r = 255;
+            // g = 255 - ((value - minValue) / (maxValue - minValue)) * 255
             ctx.fillStyle = "rgb(" + r + "," + g + ",0)"
             ctx.fillRect(x, y, pixelGap, pixelGap);
         }
     }
 }
 
-kakao.maps.event.addListener(map, 'drag', () => {
+// kakao.maps.event.addListener(map, 'drag', () => {
+//     drawCanvas();
+// })
+
+kakao.maps.event.addListener(map, 'dragend', () => {
     drawCanvas();
 })
+
 kakao.maps.event.addListener(map, 'zoom_changed', () => {
     drawCanvas();
 })
@@ -200,8 +207,8 @@ function getValue(x, y) {
     var point = new kakao.maps.Point(x, y)
     var latitude = coordinate.coordsFromContainerPoint(point).Ma
     var longitude = coordinate.coordsFromContainerPoint(point).La
-    if (latitude <= minlat || latitude >= maxlat) return 30             // 만약 위도 33 이하, 38 이상이면 1, -1 벡터 리턴
-    if (longitude <= minlng || longitude >= maxlng) return 30
+    if (latitude <= minlat || latitude >= maxlat) return 10 
+    if (longitude <= minlng || longitude >= maxlng) return 10
 
     var gridn = selectGrid(latitude, longitude);                            // 현재 벡터에서 그리드 계산
     var g00 = grid[gridn[0]][gridn[1]]
