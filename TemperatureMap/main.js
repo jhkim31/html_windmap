@@ -191,13 +191,13 @@ function drawCanvas() {
     }
 }
 
-// kakao.maps.event.addListener(map, 'drag', () => {
-//     drawCanvas();
-// })
-
-kakao.maps.event.addListener(map, 'dragend', () => {
+kakao.maps.event.addListener(map, 'drag', () => {
     drawCanvas();
 })
+
+// kakao.maps.event.addListener(map, 'dragend', () => {
+//     drawCanvas();
+// })
 
 kakao.maps.event.addListener(map, 'zoom_changed', () => {
     drawCanvas();
