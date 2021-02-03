@@ -1,6 +1,6 @@
 # [windMap] 6. 지도의 위치에 따라 동적으로 바뀌는 WindMap 만들기
 
-지금까지의 기술 + @로 이 프로젝트를 완료하겠다.
+Demo: http://211.214.35.45:14000/Chap6
 
 기본 원리는
 ---
@@ -12,7 +12,9 @@
 ---
 
 ## step1 
-### 특정 위도 경도(0.25씩)마다 벡터를 기록한다. (현재는 임의의 값)
+### 특정 위도 경도(0.25씩)마다 지점의 x,y 벡터를 기록한다. 
+(현재는 임의의 값)
+1.9,-1.4,1.5,-1.5,1.7,-0.7,0.8,-1.6,1.9,-1.2...
 경도 124 ~ 130 도
 위도 33 ~ 38도
 위 좌표정도면 우리나라를 다 덮는다.
@@ -52,7 +54,7 @@ coordinate.coordsFromContainerPoint(point).Ma //위도
 ## step3
 ### 위도, 경도로 해당 위.경도의 벡터를 구한다.
 
-1. 해당 위도.경도의 평면을 구한다.
+1. 해당 위도.경도의 평면(어느 벡터의 영향을 받는지 Chap3 참고)을 구한다.
 ```javascript
 function selectGrid(latitude, longitude) {                                
     gridlng = parseInt((longitude - 124) / 0.25)         //ex) 125.1 -> 4 
@@ -62,7 +64,7 @@ function selectGrid(latitude, longitude) {
 ```
 해당하는 평면을 좌표 쌍으로 리턴한다.
 
-2. 해당 평면에서의 벡터를 구한다.
+2. 해당 평면에서의 벡터를 bilinear interpolation 으로 보간값을 구한다.
 ```javascript
 var interpolate = function (latitude, longitude, g00, g10, g01, g11, gridn) {
     x = (longitude % 0.25) * 4
