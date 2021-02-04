@@ -2647,7 +2647,7 @@ function buildobj(i) {
     y = getRandomArbitrary(0, cny)
     coordinate = map.getProjection()
     point = new kakao.maps.Point(x, y)
-    a[i] = new ob(x, y,coordinate.coordsFromContainerPoint(point).Ma, coordinate.coordsFromContainerPoint(point).La, i, currentFrame)
+    a[i] = new wind(x, y,coordinate.coordsFromContainerPoint(point).Ma, coordinate.coordsFromContainerPoint(point).La, i, currentFrame)
 }
 
 //특정 인덱스 바람 객체 삭제
@@ -2657,7 +2657,7 @@ function removeObj(index) {
 }
 
 //바람 객체 클래스
-function ob(x, y, latitude, longitude, index, frame) {
+function wind(x, y, latitude, longitude, index, frame) {
     this.index = index                              // 객체배열에서 인덱스(삭제시 필요)
     this.x = x;                                     // 화면에서의 x 좌표
     this.y = y;                                     // 화면에서의 y 좌표
@@ -2665,8 +2665,8 @@ function ob(x, y, latitude, longitude, index, frame) {
     this.longitude = longitude;                     // 지도에서의 경도
     this.frame = frame                              // 생성될 당시 프레임
     this.coordinate = map.getProjection()
-    //바람 객체 이동 함수 (현재 좌표의 벡터를 받아 그 벡터 방향으로 이동)
-    this.dr = function () {
+    //바람 객체 이동 함수 (현재 좌표의 벡터를 받아 그 벡터 방향으로 이동)    
+    this.windMove = function () {
         if (this.x > cnx || this.y > cny || this.x < 0 || this.y < 0) {                 //만약 캔버스 범위를 벗어나면 삭제
             return removeObj(this.index)
         } else {
@@ -2874,7 +2874,7 @@ function anim() {
     c.fillStyle = "rgba(255, 255, 255, 0.2)"
     c.fillRect(0, 0, cn.width, cn.height);
     a.forEach(function (e, i) {
-        e.dr();
+        e.windMove();
     });
 }
 
