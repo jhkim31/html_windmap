@@ -1,4 +1,3 @@
-import {gridData} from "./data.js"
 var container = document.getElementById('map');                 //지도를 그릴 element
 var options = {
     center: new kakao.maps.LatLng(37.151198243701934, 128.22723681773422),
@@ -7,7 +6,7 @@ var options = {
 
 var map = new kakao.maps.Map(container, options);               // container element에 맵 객체 생성
 
-var windmap = new Windmap(map, gridData, 31, 44, 115, 138, 0.5);
+var windmap = new Windmap(map, 31, 44, 115, 138, 0.5);
 
 window.onload = () => {
     windmap.init();

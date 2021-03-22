@@ -25,17 +25,6 @@ body,
         #playWind {
             margin-left: 10px;
         }
-
-        #range1 {
-            bottom: 20px;
-            left: 30px;
-        }
-
-        #windCount {
-            bottom: 20px;
-            left: 180px;
-        }
-
         #category {
             bottom: 10px;
             margin: 30px;
@@ -64,6 +53,11 @@ body,
         #speed0 {
             width:150px;
             color: white;
+        }
+
+        #range1 {
+            bottom: 20px;
+            left: 30px;
         }
 
         #range2 {

@@ -1,8 +1,7 @@
-
-window.Windmap = function (map, gridData, minlat, maxlat, minlng, maxlng, gap) {
+import {gridData} from "./data.js"
+window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
 
     var map = map;
-    var gridData = gridData;
     var mapProjection = map.getProjection()
 
 
