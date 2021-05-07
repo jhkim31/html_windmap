@@ -1,9 +1,5 @@
-import {gridData} from "./data.js"
-window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
-
-    var map = map;
-    var mapProjection = map.getProjection()
-
+import { gridData } from "./data.js"
+var Windmap = function (minlat, maxlat, minlng, maxlng, gap) {
 
     var minlat = minlat
     var maxlat = maxlat
@@ -12,8 +8,8 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
     var gap = gap
     var latgap = (maxlat * 10 - minlat * 10) / 10
     var lnggap = (maxlng * 10 - minlng * 10) / 10
-    
-    var cn = document.getElementById('windmap')              // 캔버스 객체
+
+    var cn = document.getElementById('windmap')         // 캔버스 객체
     var c = cn.getContext('2d');                        // 캔버스
     var a = []                                          // 바람 하나하나 객체의 배열
     var cnx;                                            // 캔버스 width
@@ -22,13 +18,10 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
     var currentFrame = 0                                // 애니메이션의 현재 프레임
     var animationId                                     // 애니메이션 아이디 (정지시 필요)
 
-    var showWind = false
-    var windCount = 1000;               //default
+    this.showWind = false
+    var windCount = 1000;                   //default
     var showSpeed = 1;                       //default
 
-
-
-    
 
     //페이지 resize시 실행
     window.onresize = () => {
@@ -49,8 +42,8 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
     function buildobj(i) {
         var x = getRandomArbitrary(0, cnx)
         var y = getRandomArbitrary(0, cny)
-        var point = new kakao.maps.Point(x, y)
-        a[i] = new wind(x, y, mapProjection.coordsFromContainerPoint(point).Ma, mapProjection.coordsFromContainerPoint(point).La, i, currentFrame)
+        var point = L.point(x, y)
+        a[i] = new wind(x, y, map.containerPointToLatLng(point).lat, map.containerPointToLatLng(point).lng, i, currentFrame)
     }
 
     //특정 인덱스 바람 객체 삭제
@@ -85,31 +78,33 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
                 this.x = ls.x + nextVec[0] * showSpeed                                                  // 현재 좌표에서 벡터만큼 이동                                                                                                      
                 this.y = ls.y + nextVec[1] * showSpeed                                            // 현재 좌표에서 벡터만큼 이동                                                                                                      
 
-                var point = new kakao.maps.Point(this.x, this.y)
-                this.latitude = mapProjection.coordsFromContainerPoint(point).Ma               // 이동한 만큼 다시 현재 위치 계산
-                this.longitude = mapProjection.coordsFromContainerPoint(point).La              // 이동한 만큼 다시 현재 위치 계산
+                var point = L.point(this.x, this.y)
+
+                this.latitude = map.containerPointToLatLng(point).lat               // 이동한 만큼 다시 현재 위치 계산
+
+                this.longitude = map.containerPointToLatLng(point).lng
 
                 c.beginPath();
                 c.lineWidth = 2;
-                if (Object.keys(colorPicker).length != 0) {
-                    if (nextVec[2] > 7) {
-                        c.strokeStyle = colorPicker.speed7.color;
-                    } else if (nextVec[2] > 5) {
-                        c.strokeStyle = colorPicker.speed5.color;
-                    } else if (nextVec[2] > 3) {
-                        c.strokeStyle = colorPicker.speed3.color;
-                    } else if (nextVec[2] > 1) {
-                        c.strokeStyle = colorPicker.speed1.color;
-                    } else {
-                        c.strokeStyle = colorPicker.speed0.color;
-                    }
-                }
+
+                // if (nextVec[2] > 7) {
+                //     c.strokeStyle = "#ff0000";
+                // } else if (nextVec[2] > 5) {
+                //     c.strokeStyle = "#ff4600";
+                // } else if (nextVec[2] > 3) {
+                //     c.strokeStyle = "#ff6400"
+                // } else if (nextVec[2] > 1) {
+                //     c.strokeStyle = "#ff8C00"
+                // } else {
+                //     c.strokeStyle = "#000000"
+                // }
+
+                c.strokeStyle = "#333333"
+
                 c.moveTo(ls.x, ls.y);
                 c.lineTo(this.x, this.y);
                 c.stroke();
                 c.closePath();
-
-                //기록한 현재 위치와 바뀐 위치까지 그림.
             }
         }
     }
@@ -123,7 +118,6 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
         var g10 = grid[gridn[0]][gridn[1] + 1]
         var g01 = grid[gridn[0] + 1][gridn[1]]
         var g11 = grid[gridn[0] + 1][gridn[1] + 1]
-        // 현재 좌표를 감싸는 네(4) 그리드 계산
 
         return interpolate(latitude, longitude, g00, g10, g01, g11, gridn)      // 4 그리드로 보간값 구해서 리턴
     }
@@ -177,6 +171,11 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
         cn.height = window.innerHeight
         cnx = cn.width - 1
         cny = cn.height - 1
+        readGrid()                 //초기 한번만 실행되면 됨.
+        build()
+    }
+
+    function readGrid() {
         var count = 0;
         for (var i = 0; i < ((latgap * 10) / (gap * 10)) + 1; i++) {
             grid[i] = []
@@ -187,7 +186,6 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
                 grid[i][j][2] = count / 2
             }
         }
-        alert("준비가 완료되었습니다.")
     }
 
     //min, max 랜덤값 리턴
@@ -208,149 +206,26 @@ window.Windmap = function (map, minlat, maxlat, minlng, maxlng, gap) {
 
     //에니메이션 정지
     function stopAnim() {
+        console.log('stop!!')
         cancelAnimationFrame(animationId)
     }
 
-    
-
     this.toggleWindLayer = () => {
-        if (showWind) {
+        if (this.showWind) {
             a = []
             stopAnim()
             cn.width = window.innerWidth
             cn.height = window.innerHeight
             cnx = cn.width - 1
             cny = cn.height - 1
-            showWind = !showWind
-        } else {
-            build()
+            this.showWind = !this.showWind
+        } else {  
+            build();          
             anim()
-            showWind = !showWind
+            this.showWind = !this.showWind
         }
-    }
-
-    var colorPicker = {}
-    this.addControler = () => {
-        document.getElementById('category').innerHTML += 
-        `         
-            <div id="speed7">
-                <input type="color" id="picker7" name="head" value="#ff0000"> speed > 7m/s
-            </div>
-            <div id="speed5">
-                <input type="color" id="picker5" name="head" value="#ff4600"> speed > 5m/s
-            </div>
-            <div id="speed3">
-                <input type="color" id="picker3" name="head" value="#ff6400"> speed > 3m/s
-            </div>
-            <div id="speed1">
-                <input type="color" id="picker1" name="head" value="#ff8C00"> speed > 1m/s
-            </div>
-            <div id="speed0">
-                <input type="color" id="picker0" name="head" value="#000000"> speed &lt; 1m/s
-            </div>
-            <input type="range" min="1" max="1500" value="1000" id="range1">
-            <div id="windCount"></div>
-            <input type="range" min="0" max="2.0" value="1.0" id="range2" step="0.1">
-            <div id="showSpeed"></div>
-            <div id="windSpeed"></div>
-        `
-
-        colorPicker.speed7 = {
-            "dom": document.getElementById('speed7'),
-            "color": "",
-            "picker": document.getElementById('picker7')
-        }
-        colorPicker.speed5 = {
-            "dom": document.getElementById('speed5'),
-            "color": "",
-            "picker": document.getElementById('picker5')
-        }
-        colorPicker.speed3 = {
-            "dom": document.getElementById('speed3'),
-            "color": "",
-            "picker": document.getElementById('picker3')
-        }
-        colorPicker.speed1 = {
-            "dom": document.getElementById('speed1'),
-            "color": "",
-            "picker": document.getElementById('picker1')
-        }
-        colorPicker.speed0 = {
-            "dom": document.getElementById('speed0'),
-            "color": "",
-            "picker": document.getElementById('picker0')
-        }
-
-        colorPicker.speed7.color = colorPicker.speed7.picker.value
-        colorPicker.speed7.dom.style.backgroundColor = colorPicker.speed7.color
-
-        colorPicker.speed5.color = colorPicker.speed5.picker.value
-        colorPicker.speed5.dom.style.backgroundColor = colorPicker.speed5.color
-
-        colorPicker.speed3.color = colorPicker.speed3.picker.value
-        colorPicker.speed3.dom.style.backgroundColor = colorPicker.speed3.color
-
-        colorPicker.speed1.color = colorPicker.speed1.picker.value
-        colorPicker.speed1.dom.style.backgroundColor = colorPicker.speed1.color
-
-        colorPicker.speed0.color = colorPicker.speed0.picker.value
-        colorPicker.speed0.dom.style.backgroundColor = colorPicker.speed0.color
-
-        colorPicker.speed7.picker.addEventListener("input", e => {
-            colorPicker.speed7.color = e.target.value
-            colorPicker.speed7.dom.style.backgroundColor = colorPicker.speed7.color
-        }, false)
-
-        colorPicker.speed5.picker.addEventListener("input", e => {
-            colorPicker.speed5.color = e.target.value
-            colorPicker.speed5.dom.style.backgroundColor = colorPicker.speed5.color
-
-        }, false)
-
-        colorPicker.speed3.picker.addEventListener("input", e => {
-            colorPicker.speed3.color = e.target.value
-            colorPicker.speed3.dom.style.backgroundColor = colorPicker.speed3.color
-        }, false)
-
-        colorPicker.speed1.picker.addEventListener("input", e => {
-            colorPicker.speed1.color = e.target.value
-            colorPicker.speed1.dom.style.backgroundColor = colorPicker.speed1.color
-        }, false)
-
-        colorPicker.speed0.picker.addEventListener("input", e => {
-            colorPicker.speed0.color = e.target.value
-            colorPicker.speed0.dom.style.backgroundColor = colorPicker.speed0.color
-        }, false)
-
-        var windCountDiv = document.getElementById('windCount');
-        var gauge = document.getElementById('range1')
-        windCount = document.getElementById("range1").value
-        windCountDiv.innerHTML = "바람 밀도 : " + gauge.value
-    
-        var showSpeedDiv = document.getElementById("showSpeed");
-        var gauge2 = document.getElementById("range2");
-        showSpeed = document.getElementById("range2").value
-        showSpeedDiv.innerHTML = "바람 속도 : " + gauge2.value        
-    
-        gauge.oninput = function () {
-            windCountDiv.innerHTML = "바람 밀도 : " + this.value
-            windCount = this.value
-            build();
-        }    
-
-        gauge2.oninput = function () {
-            showSpeedDiv.innerHTML = "바람 속도 : " + this.value
-            showSpeed = this.value
-        }
-
-        document.getElementById('map').addEventListener('click', e => {
-            var point = new kakao.maps.Point(e.pageX, e.pageY)
-            console.log(point, mapProjection.coordsFromContainerPoint(point))
-            var windSpeed = document.getElementById('windSpeed')
-            var vector = getVector(mapProjection.coordsFromContainerPoint(point).Ma, mapProjection.coordsFromContainerPoint(point).La)
-            windSpeed.innerHTML =
-                `${mapProjection.coordsFromContainerPoint(point).Ma.toFixed(3)}, ${mapProjection.coordsFromContainerPoint(point).La.toFixed(3)}, 
-            vector : ${vector[0].toFixed(3)}, ${vector[1].toFixed(3)} scale: ${vector[2].toFixed(3)}m/s zoomLevel: ${map.getLevel()}`
-        })
     }
 }
+
+
+export { Windmap }
