@@ -198,7 +198,8 @@ var Windmap = function (minlat, maxlat, minlng, maxlng, gap) {
         currentFrame++
         animationId = requestAnimationFrame(anim)
         c.fillStyle = "rgba(255, 255, 255, 0.2)"
-        c.fillRect(0, 0, cn.width, cn.height);
+        c.fillRect(0, 0, cn.width, cn.height);        
+        // c.clearRect(0, 0, cn.width,cn.height );
         a.forEach(function (e, i) {
             e.windMove();
         });

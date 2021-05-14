@@ -10,4 +10,3 @@ window.onload = () => {
 
 
 document.getElementById('playWind').addEventListener('click', windmap.toggleWindLayer)
-
