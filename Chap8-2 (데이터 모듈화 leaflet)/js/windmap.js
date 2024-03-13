@@ -109,6 +109,7 @@ var Windmap = function (minlat, maxlat, minlng, maxlng, gap) {
         }
     }
 
+    
     function getVector(latitude, longitude) {
         if (latitude <= minlat || latitude >= maxlat) return [0, 0, 0]             // 만약 위도 33 이하, 38 이상이면 1, -1 벡터 리턴
         if (longitude <= minlng || longitude >= maxlng) return [0, 0, 0]         // 만약 경도 124 이하, 130 이상이면 1, -1 벡터 리턴

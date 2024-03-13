@@ -1,7 +1,5 @@
 # [windMap] 5. 지도 위에 격자(grid)벡터 Animation Overlay하기
 
-Demo: http://211.214.35.45:14000/Chap5
-
 Canvas를 Map위에 Overlay할때 
 
 * position: absolute;
@@ -24,6 +22,7 @@ Canvas를 Map위에 Overlay할때
 
 을 해준다.
 `pointer-events:none;` 설정이 없으면, z-index상 Canvas가 위에 있기 때문에, 이벤트가 Canvas로 다 들어가게 된다.
+
 그렇게 되면 지도를 조작할 수 없게 되므로 저 설정을 통해 canvas의 이벤트를 꺼준다.
 
 이렇게 되면 지도 위에 Overlay할 수 있게 된다.
